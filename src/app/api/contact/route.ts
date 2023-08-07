@@ -5,6 +5,43 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const prismaClient = new PrismaClient()
 
+/**
+ * @swagger
+ * /api/contact:
+ *  post:
+ *    tags:
+ *      - Contact
+ *    description: Add Contact
+ *    responses:
+ *      201:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                statusCode:
+ *                  type: integer
+ *                  format: int32
+ *                  default: 201
+ *                message:
+ *                  type: string
+ *                  default: Register Success
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              contact_name:
+ *                type: string
+ *                default: Jhon Doe
+ *              email:
+ *                type: string
+ *                default: email
+ *              phone_number:
+ *                type: string
+ *                default: 0892028292
+ */
 export async function POST (req: NextRequest): Promise<NextResponse> {
   interface Body {
     contact_name: string
