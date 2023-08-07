@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  next-db:
+    container_name: next-db
+    image: mysql:latest
+    ports:
+      - protocol: tcp
+        target: 3306
+        published: 1234
+    environment:
+      MYSQL_ROOT_PASSWORD: root
