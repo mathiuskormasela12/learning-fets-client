@@ -1,13 +1,54 @@
 'use client'
 // ========= Home Page
 // import all packages
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import moment from 'moment'
+import { client } from '@/helpers/client'
 
 // import all components
 import { Container, Row, Col, Table, Button } from 'react-bootstrap'
+import { type NormalizeOAS, type OASOutput } from 'fets'
+import { type openapi } from '@/open-api/openapi-spec'
 
 const HomePage: React.FC = () => {
+  type ContactResponse = OASOutput<NormalizeOAS<typeof openapi>, '/api/contacts', 'get', 200>
+  const [contacts, setContact] = useState<ContactResponse>()
+
+  const getContacts = async (): Promise<boolean> => {
+    const resoponse = await client['/api/contacts'].get()
+
+    if (!resoponse.ok) {
+      window.alert('Failed')
+      return false
+    }
+
+    const result = await resoponse.json()
+    setContact(result)
+    return true
+  }
+
+  useEffect(() => {
+    getContacts()
+  }, [])
+
+  const deleteContact = async (contactId: string | undefined): Promise<void> => {
+    if (typeof contactId === 'string') {
+      const response = await client['/api/contact/{contactId}'].delete({
+        params: {
+          contactId
+        }
+      })
+
+      if (!response.ok) {
+        window.alert('Failed')
+      } else {
+        await response.json()
+        getContacts()
+      }
+    }
+  }
+
   return (
     <>
       <Container>
@@ -32,21 +73,23 @@ const HomePage: React.FC = () => {
               </thead>
 
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Yerin</td>
-                  <td>08239393933</td>
-                  <td>jhon@mail.com</td>
-                  <td>20 January 2022</td>
-                  <td>
-                    <Button type="button" variant='danger'>
-                      Delete
-                    </Button>
-                    <Link href={`/contact/edit/${'020220'}`} className="btn btn-primary d-inline-block">
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
+                {contacts?.data?.map((contact, index) => (
+                   <tr key={contact.id}>
+                    <td>{index + 1}</td>
+                    <td>{contact.contact_name}</td>
+                    <td>{contact.phone_number}</td>
+                    <td>{contact.email}</td>
+                    <td>{moment(contact.created_at).format('D MMMM YYYY')}</td>
+                    <td>
+                      <Button type="button" variant='danger' onClick={async () => { await deleteContact(contact.id) }}>
+                        Delete
+                      </Button>
+                      <Link href={`/contact/edit/${contact?.id ?? ''}`} className="btn btn-primary d-inline-block">
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           </Col>
