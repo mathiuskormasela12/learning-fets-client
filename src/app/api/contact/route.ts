@@ -12,6 +12,7 @@ const prismaClient = new PrismaClient()
  *    tags:
  *      - Contact
  *    description: Add Contact
+ *    summary: Add Contact
  *    responses:
  *      201:
  *        content:

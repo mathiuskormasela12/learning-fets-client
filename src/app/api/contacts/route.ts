@@ -9,7 +9,7 @@ const prismaClient = new PrismaClient()
  * @swagger
  * /api/contacts:
  *  get:
- *    title: Get Contacts
+ *    summary: Get Contacts
  *    description: Get All Contacts
  *    tags:
  *      - Contact
