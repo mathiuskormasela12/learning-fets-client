@@ -18,19 +18,19 @@ const AddContact: React.FC = () => {
 
   const addContact = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
-    const response = await client['/api/contact'].post({
-      json: {
-        contact_name: state.contactName,
-        email: state.email,
-        phone_number: state.phoneNumber
-      }
-    })
 
-    if (!response.ok) {
-      window.alert('Failed')
-    } else {
-      await response.json()
+    try {
+      await client['/api/contact'].post({
+        json: {
+          contact_name: state.contactName,
+          email: state.email,
+          phone_number: state.phoneNumber
+        }
+      })
+
       router.push('/')
+    } catch {
+      window.alert('Failed')
     }
   }
 

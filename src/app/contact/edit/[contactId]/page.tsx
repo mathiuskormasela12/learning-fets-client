@@ -4,9 +4,13 @@ import { useParams, useRouter } from 'next/navigation'
 // =========== Edit Contact
 // import all pages
 import React, { useState, type ChangeEvent, useEffect, type FormEvent } from 'react'
+import { type OASOutput, type NormalizeOAS } from 'fets'
+import { type openapi } from '@/open-api/openapi-spec'
 
 // import all bootstrap components
 import { Col, Container, Row, Form, Button } from 'react-bootstrap'
+
+type ContactResponse = OASOutput<NormalizeOAS<typeof openapi>, '/api/contact/{contactId}', 'get', 200>
 
 const EditContact: React.FC = () => {
   const params = useParams()
@@ -27,22 +31,21 @@ const EditContact: React.FC = () => {
 
   useEffect(() => {
     const getContact = async (): Promise<void> => {
-      const response = await client['/api/contact/{contactId}'].get({
-        params: {
-          contactId: params.contactId as string
-        }
-      })
+      try {
+        const result = await client['/api/contact/{contactId}'].get({
+          params: {
+            contactId: params.contactId as string
+          }
+        }) as ContactResponse
 
-      if (!response.ok) {
-        window.alert('Failed')
-      } else {
-        const result = await response.json()
         setState((state) => ({
           ...state,
           contactName: result.data?.contact_name ?? '',
           email: result.data?.email ?? '',
           phoneNumber: result.data?.phone_number ?? ''
         }))
+      } catch {
+        window.alert('Failed')
       }
     }
 
@@ -51,22 +54,22 @@ const EditContact: React.FC = () => {
 
   const updateContact = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
-    const response = await client['/api/contact/{contactId}'].put({
-      params: {
-        contactId: params.contactId as string
-      },
-      json: {
-        contact_name: state.contactName,
-        email: state.email,
-        phone_number: state.phoneNumber
-      }
-    })
 
-    if (!response.ok) {
-      window.alert('Failed')
-    } else {
-      await response.json()
+    try {
+      const res = await client['/api/contact/{contactId}'].put({
+        params: {
+          contactId: params.contactId as string
+        },
+        json: {
+          contact_name: state.contactName,
+          email: state.email,
+          phone_number: state.phoneNumber
+        }
+      })
+      console.log(res)
       router.push('/')
+    } catch {
+      window.alert('Failed')
     }
   }
 

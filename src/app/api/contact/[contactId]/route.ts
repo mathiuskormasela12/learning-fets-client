@@ -150,9 +150,9 @@ export async function PUT (req: NextRequest, { params }: { params: { contactId: 
   }
 
   try {
-    const result = await prismaClient.contact.findFirst({
+    const result = await prismaClient.contact.findUnique({
       where: {
-        email: body.email
+        id: params.contactId
       }
     })
 

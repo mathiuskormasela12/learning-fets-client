@@ -16,14 +16,8 @@ const HomePage: React.FC = () => {
   const [contacts, setContact] = useState<ContactResponse>()
 
   const getContacts = async (): Promise<boolean> => {
-    const resoponse = await client['/api/contacts'].get()
+    const result = await client['/api/contacts'].get() as ContactResponse
 
-    if (!resoponse.ok) {
-      window.alert('Failed')
-      return false
-    }
-
-    const result = await resoponse.json()
     setContact(result)
     return true
   }
@@ -34,17 +28,15 @@ const HomePage: React.FC = () => {
 
   const deleteContact = async (contactId: string | undefined): Promise<void> => {
     if (typeof contactId === 'string') {
-      const response = await client['/api/contact/{contactId}'].delete({
-        params: {
-          contactId
-        }
-      })
-
-      if (!response.ok) {
-        window.alert('Failed')
-      } else {
-        await response.json()
+      try {
+        await client['/api/contact/{contactId}'].delete({
+          params: {
+            contactId
+          }
+        })
         getContacts()
+      } catch {
+        window.alert('Failed')
       }
     }
   }
